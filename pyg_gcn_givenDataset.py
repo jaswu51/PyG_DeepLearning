@@ -105,7 +105,7 @@ torch.manual_seed(42)
 optimizer_name = "Adam"
 lr = 1e-1
 optimizer = getattr(torch.optim, optimizer_name)(model.parameters(), lr=lr)
-epochs = 200
+epochs = 100
 
 def train():
   model.train()
@@ -123,6 +123,7 @@ def test():
   mask = data['test_mask']
   pred = logits[mask].max(1)[1]
   acc = pred.eq(data.y[mask]).sum().item() / mask.sum().item()
+
   return acc1,acc
 
 for epoch in range(1, epochs):
