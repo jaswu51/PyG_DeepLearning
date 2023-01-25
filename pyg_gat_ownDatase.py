@@ -122,7 +122,7 @@ data = dataset[0]
 
 
 
-# GCN model with 2 layers 
+# GAT model
 class Net(torch.nn.Module):
     def __init__(self,in_channels, out_channels,heads,edge_dim):
         super(Net, self).__init__()
