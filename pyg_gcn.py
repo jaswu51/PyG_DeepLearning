@@ -14,7 +14,7 @@ adj = nx.to_scipy_sparse_array(G).tocoo()
 row = torch.from_numpy(adj.row.astype(np.int64)).to(torch.long)
 col = torch.from_numpy(adj.col.astype(np.int64)).to(torch.long)
 edge_index = torch.stack([row, col], dim=0)
-
+print(edge_index.shape)
 # using degree as embedding
 embeddings = np.array(list(dict(G.degree()).values()))
 
@@ -127,10 +127,5 @@ def test():
 
 for epoch in range(1, epochs):
   train()
-
-train_acc,test_acc = test()
-
-print('#' * 70)
-print('Train Accuracy: %s' %train_acc )
-print('Test Accuracy: %s' % test_acc)
-print('#' * 70)
+  train_acc,test_acc = test()
+  print(f'Epoch: {epoch:02d}, Train Accuracy: {train_acc:.4f}, Test Accuracy: {test_acc:.4f}')
