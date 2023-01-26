@@ -39,7 +39,7 @@ from torch_geometric.datasets import ZINC
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn import BatchNorm, PNAConv, global_add_pool, GATConv
 from torch_geometric.utils import degree
-
+import random
 
 # read text file into pandas DataFrame
 df = pd.read_csv("data/Ave.txt", sep=",",header=0)
@@ -67,7 +67,11 @@ df['class_name']=df['detclass']
 df['class_name']=df.class_name.map(mapdict)
 df['centroid']= list(zip((df['x1'] + df['x2'])*0.5, (df['y1'] + df['y2'])*0.5))
 node_features=np.array(df.drop(['centroid', 'path','class_name','node_id','video_amount','frame_amount','video_no','frame_no','conf'], axis=1)).astype(float)
-node_labels=torch.ones(node_features.shape[0]).type(torch.LongTensor)
+
+my_list = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1]
+# random.choices([0,1], k=40)
+node_labels=torch.from_numpy(np.array(my_list))
+
 edge_index_from=[]
 edge_index_to=[]
 edge_attr=[]
@@ -122,21 +126,26 @@ data = dataset[0]
 
 
 
+
 # GAT model
 class Net(torch.nn.Module):
-    def __init__(self,in_channels, out_channels,heads,edge_dim):
+    def __init__(self,in_channels, hidden_channels,out_channels,heads,edge_dim):
         super(Net, self).__init__()
-        self.conv1 = GATConv(in_channels, out_channels,heads,edge_dim)
+        self.conv1 = GATConv(in_channels, hidden_channels,heads,edge_dim)
+        self.hidden= torch.nn.Linear(hidden_channels*heads,out_channels)
 
     def forward(self, data):
         x=self.conv1(data.x,data.edge_index,data.edge_attr)
+        x=self.hidden(x)
         return F.log_softmax(x, dim=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 data =  data.to(device)
 
-model = Net(data.num_node_features,out_channels=12,heads=3,edge_dim=data.edge_dim).to(device) 
+model = Net(data.num_node_features,hidden_channels=3,out_channels=2,heads=30,edge_dim=data.edge_dim).to(device) 
+
+
 
 torch.manual_seed(42)
 

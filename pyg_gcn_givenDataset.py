@@ -119,6 +119,8 @@ def test():
   logits = model()
   mask1 = data['train_mask']
   pred1 = logits[mask1].max(1)[1]
+  print(logits[mask1])
+  print(logits[mask1].max(1))
   acc1 = pred1.eq(data.y[mask1]).sum().item() / mask1.sum().item()
   mask = data['test_mask']
   pred = logits[mask].max(1)[1]
